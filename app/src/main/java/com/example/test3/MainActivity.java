@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -20,14 +21,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.example.test3.A;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Handler mHandler; // Our main handler that will receive callback notifications
     private ConnectedThread mConnectedThread; // bluetooth background worker thread to send and receive data
-    private BluetoothSocket mBTSocket[] = new BluetoothSocket[2]; // bi-directional client-to-client data path
+    private BluetoothSocket mBTSocket[] = new BluetoothSocket[3]; // bi-directional client-to-client data path
     private int mSocketCount = 0;
 
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
@@ -82,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mHandler = new Handler(){
+            @RequiresApi(api = Build.VERSION_CODES.N)
             public void handleMessage(android.os.Message msg){
                 if(msg.what == MESSAGE_READ){
                     String readMessage = null;
@@ -91,6 +102,25 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     mReadBuffer.setText(readMessage);
+
+                    // Assume messages in JSON { "type": n, "data": [] } form.
+                    try {
+                        JSONObject json = new JSONObject(readMessage);
+
+                        List<Integer> d = new ArrayList<>();
+                        JSONArray raw = json.getJSONArray("data");
+                        for (int i = 0; i < raw.length(); ++i) {
+                            d.add(raw.getInt(i));
+                        }
+
+                        A.getInstance().add(
+                            A.Type.fromInt(json.getInt("type")),
+                            d.stream().mapToInt(Integer::intValue).toArray()
+                        );
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if(msg.what == CONNECTING_STATUS){
@@ -276,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
                         mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, name)
                                 .sendToTarget();
-                        mSocketCount++;
+                        mSocketCount = (mSocketCount + 1) % 3;
                     }
                 }
             }.start();
