@@ -16,7 +16,7 @@ public class A {
     private List<int[]> locD, posD, wgtD;
 
     private List<int[]> testD = null;
-    private final boolean isTest = false;
+    private final boolean isTest = true;
 
     public enum Type {
         LOC (1),

@@ -7,16 +7,6 @@
     <title>Visualization of Pressures</title>
     <link href="main.css" rel="stylesheet" type="text/css">
     <script src="main.js" type="text/javascript"></script>
-    <script>
-        if (!!window.EventSource) {
-            var source = new EventSource('/serial');
-            source.onopen = () => { console.log('open') };
-            source.onmessage = e => {
-                update(JSON.parse(e.data));
-                draw();
-            };
-        }
-    </script>
 </head>
 <body>
     <p>Current Posture</p>
@@ -44,10 +34,11 @@
     </div>
     <p>Score Timeline</p>
     <button onclick="toggleTimeline();">Pause</button>
+    <button onclick="refresh(10);">Refresh</button>
     <div id='timeline'>
     </div>
     <p>Visualization of Pressures at Each Point</p>
-    <canvas width="1000px" height="1000px">Canvas is not supported in this browser.</canvas>
+    <canvas>Canvas is not supported in this browser.</canvas>
     <script type="x-shader/x-vertex" id="vertex-shader">
         #version 100
         precision highp float;

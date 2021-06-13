@@ -10,6 +10,17 @@ var sensors = new Float32Array([
 ]);
 var sensorIdx;
 
+var posturesData = [
+// FL  FR   RL   RR    // F: Front, R: Rear, L: Left, R: Right
+ [1.0, 1.0, 1.0, 1.0], // 0. Normal; 정상 자세
+ [1.0, 1.0, 0.0, 0.0], // 1. Sway back; 엉덩이를 앞으로 뺀 자세.
+ [0.0, 0.0, 1.0, 1.0], // 2. Hunched back; 등을 앞으로 굽힌 자세
+ [1.0, 0.0, 1.0, 1.0], // 3-1. Legs Crossed; 다리를 꼰 자세
+ [0.0, 1.0, 1.0, 1.0], // 3-2. Legs Crossed; 다리를 꼰 자세
+ [1.0, 0.0, 1.0, 0.0], // 4-1. Tilted body; 한쪽으로 기운 자세
+ [0.0, 1.0, 0.0, 1.0], // 4-2. Tilted body; 한쪽으로 기운 자세
+];
+
 var postureImages;
 
 var timeline;
@@ -101,7 +112,6 @@ window.addEventListener("load", function setupWebGL(event) {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(posIdx, 3, gl.FLOAT, false, 3 * 4, 0);
 
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.useProgram(program);
     draw(sensorIdx);
 }, false);
@@ -185,9 +195,68 @@ function toggleTimeline() {
 
 function draw()
 {
+    resize();
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
     gl.clearColor(0.0, 0.5, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.uniformMatrix4fv(sensorIdx, false, sensors);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
+
+function resize()
+{
+    if (gl.canvas.width !== gl.canvas.clientWidth || gl.canvas.height !== gl.canvas.clientHeight)
+    {
+        gl.canvas.width = gl.canvas.clientWidth;
+        gl.canvas.height = gl.canvas.clientHeight;
+    }
+}
+
+function refresh(n) {
+    var rawJson = Android.refresh(n);
+    var json = JSON.parse(rawJson);
+
+    for (let i = 0; i < json.length; ++i) {
+        var data = json[i].slice(1, 5);
+        var ev = evaluatePosture(data);
+        update({sensor: data, pos: ev.pos, score: ev.score});
+        draw();
+    }
+}
+
+function normalize(v) {
+    var m = Math.max(...v);
+    if (m == 0) {
+        return v;
+    }
+    return v.map(x => Math.round(x / m));
+}
+
+function dist(v, w) {
+    if (v.length != w.length)
+        return -1;
+
+    var sum = 0;
+    for (let i = 0; i < v.length; ++i) {
+        sum += (v[i] - w[i]) * (v[i] - w[i]);
+    }
+    return Math.sqrt(sum);
+}
+
+function evaluatePosture(v) {
+    v = normalize(v);
+
+    var min = 2, idx = -1;
+    var d0 = dist(v, posturesData[0]);
+    for (let i = 0; i < posturesData.length; ++i) {
+        var d = dist(v, posturesData[i]);
+        if (min > d) {
+            min = d;
+            idx = i;
+        }
+    }
+    return {pos: idx, score: Math.round((1.0 - d0 / 2.0) * 100)};
+}
+
