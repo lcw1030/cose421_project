@@ -1,0 +1,49 @@
+body {
+    text-align: center;
+    padding: 0;
+}
+
+div {
+    margin: auto;
+    width: 75%;
+    padding: 0;
+}
+div#timeline {
+    border: 1px solid black;
+    text-align: left;
+    padding: 0;
+}
+div.time_elem {
+    border: 1px solid black;
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
+    width: 10%;
+    margin: 0;
+}
+div.time_elem.clicked {
+    opacity: 0.5;
+}
+
+figure {
+    display: inline-block;
+    width: 19%;
+    margin: 0;
+    padding: 0;
+}
+img {
+    width: 100%;
+}
+img.disabled {
+    opacity: 0.5;
+}
+
+canvas {
+    display: block;
+    width: 50vw;
+    height: 50vw;
+    margin: auto;
+    padding: 0;
+    border: none;
+    background-color: black;
+}
