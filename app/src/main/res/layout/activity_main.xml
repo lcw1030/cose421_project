@@ -14,7 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 32196bc (test)
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -118,6 +121,7 @@
             android:id="@+id/timer_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:text="현재 상태" />
 
         <Button
@@ -125,6 +129,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="기록 보기" />
+=======
+            android:text="Status" />
+
+        <!--Button
+            android:id="@+id/record_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="기록 보기" /-->
+
+        <Button
+            android:id="@+id/weight_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Devices" />
+
+        <Button
+            android:id="@+id/load_posture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Load Posture" />
+
+>>>>>>> 32196bc (test)
     </LinearLayout>
 
 </RelativeLayout>
