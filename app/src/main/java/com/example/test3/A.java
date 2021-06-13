@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class A {
-    private A instance = null;
+    private static A instance = null;
     private List<int[]> locD, posD, wgtD;
 
     private List<int[]> testD = null;
@@ -68,7 +68,7 @@ public class A {
         return r;
     }
 
-    public A getInstance() {
+    public static A getInstance() {
         if (instance == null) {
             instance = new A();
         }
