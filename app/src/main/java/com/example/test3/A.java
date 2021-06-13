@@ -25,6 +25,19 @@ public class A {
 
         public final int dS;
 
+        public static Type fromInt(int n) {
+            switch (n) {
+                case 0:
+                    return LOC;
+                case 1:
+                    return POS;
+                case  2:
+                    return WGT;
+            }
+
+            return null;
+        }
+
         private Type(int dS) {
             this.dS = dS;
         }
