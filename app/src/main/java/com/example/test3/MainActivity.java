@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mOffBtn;
     private Button mListPairedDevicesBtn;
     private Button mDiscoverBtn;
+    private Button mLoadPosture;
     private BluetoothAdapter mBTAdapter;
     private Set<BluetoothDevice> mPairedDevices;
     private ArrayAdapter<String> mBTArrayAdapter;
@@ -87,9 +88,6 @@ public class MainActivity extends AppCompatActivity {
         mDevicesListView = (ListView)findViewById(R.id.devicesListView);
         mDevicesListView.setAdapter(mBTArrayAdapter); // assign model to view
         mDevicesListView.setOnItemClickListener(mDeviceClickListener);
-
-
-
 
         mHandler = new Handler(){
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -176,6 +174,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
+        mLoadPosture = (Button)findViewById(R.id.load_posture);
+        mLoadPosture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { loadPosture(v); }
+        });
+    }
+
+    private void loadPosture(View view) {
+        Intent intent = new Intent(this, PostureActivity.class);
+        startActivity(intent);
     }
 
     private void bluetoothOn(View view){
