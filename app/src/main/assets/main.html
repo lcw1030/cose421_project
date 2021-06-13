@@ -45,12 +45,15 @@
 
         attribute vec3 position;
         uniform mat4 sensors;
-        
+        uniform float size;
+
         varying mat4 oSensors;
+        varying float oSize;
 
         void main()
         {
             oSensors = sensors;
+            oSize = size;
             gl_Position = vec4(position, 1.0);
         }
     </script>
@@ -59,16 +62,17 @@
         precision mediump float;
 
         varying mat4 oSensors;
+        varying float oSize;
 
         void main()
         {
             float range = 0.5;
             float pressure = 0.0;
-            float maxPressure = 50.0;
+            float maxPressure = 1.0;
             vec3 rColor = vec3(1.0, 0.0, 0.0);
             vec3 bColor = vec3(0.0, 0.0, 1.0);
 
-            vec3 coord = (gl_FragCoord.xyz - vec3(500.5)) / 500.0;
+            vec3 coord = (gl_FragCoord.xyz - oSize) / oSize;
             
             // Weird gimmick of WebGL
             vec4 sensors[4];
