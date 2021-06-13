@@ -1,9 +1,11 @@
 package com.example.test3;
 
 import android.os.Build;
+import android.util.JsonReader;
 
 import androidx.annotation.RequiresApi;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.stream.IntStream;
 public class A {
     private A instance = null;
     private List<int[]> locD, posD, wgtD;
+
+    private List<int[]> testD = null;
+    private final boolean isTest = false;
 
     public enum Type {
         LOC (1),
@@ -29,6 +34,17 @@ public class A {
         locD = new ArrayList<>();
         posD = new ArrayList<>();
         wgtD = new ArrayList<>();
+        testD = new ArrayList<>();
+
+        if (isTest) {
+            int[][] d = {
+                { 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0 },
+            };
+            testD.addAll(Arrays.asList(d));
+        }
     }
 
     private void align(List<int[]> pd, int n) {
@@ -61,6 +77,10 @@ public class A {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public synchronized List<int[]> getN(int n) {
+        if (isTest) {
+            return testD;
+        }
+
         List<int[]> locPD = new ArrayList<>(locD.subList(0, n));
         List<int[]> posPD = new ArrayList<>(posD.subList(0, n));
         List<int[]> wgtPD = new ArrayList<>(wgtD.subList(0, n));
