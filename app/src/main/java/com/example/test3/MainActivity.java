@@ -453,6 +453,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -523,6 +524,7 @@ public class MainActivity extends AppCompatActivity {
                     String readMessage = null;
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
+                        Log.i("msgreadMessage", readMessage);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -544,7 +546,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 d.stream().mapToInt(Integer::intValue).toArray()
                         );
-                        Log.i("msgmsg", String.valueOf(json.getInt("type")));
+                        Log.i("msgstream", Arrays.toString(d.stream().mapToInt(Integer::intValue).toArray()));
+                        Log.i("msgtype", String.valueOf(json.getInt("type")));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
