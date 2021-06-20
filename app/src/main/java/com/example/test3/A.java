@@ -2,6 +2,7 @@ package com.example.test3;
 
 import android.os.Build;
 import android.util.JsonReader;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -14,7 +15,7 @@ import java.util.stream.IntStream;
 public class A {
     private static A instance = null;
     private List<int[]> locD, posD, wgtD;
-
+    private int n = 10;
     private List<int[]> testD = null;
     private final boolean isTest = false;
 
@@ -51,10 +52,16 @@ public class A {
 
         if (isTest) {
             int[][] d = {
-                    { 0, 0, 0, 0, 0, 0, 0 },
-                    { 0, 0, 0, 0, 0, 0, 0 },
-                    { 0, 0, 0, 0, 0, 0, 0 },
-                    { 0, 0, 0, 0, 0, 0, 0 },
+                    { 80, 153, 113, 70, 0, 1, 0 },
+                    { 80, 100, 0, 156, 0, 1, 0 },
+                    { 80, 200, 0, 250, 0, 1, 0 },
+                    { 80, 300, 0, 70, 0, 1, 0 },
+                    { 80, 1, 0, 1, 0, 1, 0 },
+                    { 80, 1, 0, 0, 0, 0, 0 },
+                    { 80, 1, 0, 0, 0, 0, 0 },
+                    { 80, 1, 0, 0, 0, 0, 0 },
+                    { 80, 1, 0, 0, 0, 0, 0 },
+                    { 80, 1, 0, 0, 0, 0, 0 },
             };
             testD.addAll(Arrays.asList(d));
         }
@@ -92,7 +99,11 @@ public class A {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public synchronized List<int[]> getN(int n) {
         if (isTest) {
-            return new ArrayList<int[]>(testD.subList(0, n));
+            n=(n+1) % 10;
+            List<int[]> arr = new ArrayList<>();
+            arr.add(testD.get(n));
+            return arr;
+           // return new ArrayList<int[]>(testD.subList(0, n));
         }
 
         int m = n;
@@ -114,12 +125,15 @@ public class A {
         align(wgtPD, Type.WGT.dS, n);
 
         List<int[]> r = concat(locPD, posPD, wgtPD);
+
         return r;
     }
 
     public synchronized void add(Type type, int[] d) {
+        Log.i("msgAd", Arrays.toString(d));
         switch (type) {
             case LOC:
+                Log.i("msgAdLOC", Arrays.toString(d));
                 if (d.length == Type.LOC.dS) {
                     locD.add(d);
                 }
@@ -135,6 +149,8 @@ public class A {
                 }
                 break;
         }
+
+
     }
 }
 

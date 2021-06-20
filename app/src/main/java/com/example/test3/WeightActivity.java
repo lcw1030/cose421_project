@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.TextView;
@@ -27,14 +28,18 @@ public class WeightActivity extends AppCompatActivity {
     private TextView mDev1_time;
     private TextView mDev2_time;
     public int status_dev1;
-    public int status_dev2;
+    //public int status_dev2;
 
     private int[] weight;
+
+    private Handler handler;
+    private Runnable runnable;
+    private final int delay = 1000;
 
     public Long start_dev1;
     public Long start_dev2;
     public Long time_dev1;
-    public Long time_dev2;
+    //public Long time_dev2;
     public Long current;
     public Long past;
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -49,8 +54,17 @@ public class WeightActivity extends AppCompatActivity {
         //mDev2_time = (TextView) findViewById(R.id.weight_dev2_time);
 
         restoreData();
-        recvData();
-        showData();
+
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                recvData();
+                showData();
+                handler.postDelayed(runnable, delay);
+            }
+        };
+        runnable.run();
     }
 
     protected void restoreData() {
@@ -67,7 +81,10 @@ public class WeightActivity extends AppCompatActivity {
         List<int[]> values = A.getInstance().getN(1);
         //weight = new int[]{values.get(0)[5], values.get(0)[6]};
         status_dev1 = values.get(0)[5];
-        //status_dev2 = weight[1];
+        //status_dev2 = values.get(0)[5];
+        if (status_dev1 == 0) {
+            time_dev1 += delay;
+        }
     }
 
     protected void showData() {
@@ -116,6 +133,6 @@ public class WeightActivity extends AppCompatActivity {
         }*/
 
         editor.commit();
-
+        handler.removeCallbacks(runnable);
     }
 }

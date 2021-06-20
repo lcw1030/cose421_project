@@ -8,8 +8,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.Handler;
 import android.os.SystemClock;
 
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,10 @@ public class TimerActivity extends AppCompatActivity {
     private int new_status;
     private int old_status;
 
+    private Handler handler;
+    private Runnable runnable;
+    private final int delay = 1000;
+
     public Long time_study=0L;
     public Long time_bed=0L;
     public Long time_out=0L;
@@ -49,7 +55,7 @@ public class TimerActivity extends AppCompatActivity {
     public Long start_bed;
     public Long start_out;
     public Long current;
-    public Long past;
+    public Long past = 0L;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -81,9 +87,16 @@ public class TimerActivity extends AppCompatActivity {
                 time_out = sf.getLong("TIME_OUT", 0L);
         }
 
-        recvData();
-        showData();
-
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                recvData();
+                showData();
+                handler.postDelayed(runnable, delay);
+            }
+        };
+        runnable.run();
     }
 
     @Override
@@ -103,18 +116,36 @@ public class TimerActivity extends AppCompatActivity {
         pressure = new int[]{values.get(1), values.get(2), values.get(3), values.get(4)};
         weight = new int[]{values.get(5), values.get(6)};*/
         List<int[]> values = A.getInstance().getN(1);
+        Log.i("msgtimer_d", Arrays.toString(values.get(0)));
         distance = values.get(0)[0];
         pressure = new int[]{values.get(0)[1], values.get(0)[2], values.get(0)[3], values.get(0)[4]};
         //weight = new int[]{values.get(0)[5], values.get(0)[6]};
         new_status = 2; // out
+        Log.i("msgtimer", String.valueOf(new_status));
         for (int i = 0; i < pressure.length; i++) {
             if (pressure[i] != 0) {
                 new_status = 0; // studying
                 break;
             }
         }
-        if (distance < ARG_DISTANCE) { //{ && new_status!=0) {
+        Log.i("msgtimer2", String.valueOf(new_status));
+        Log.i("msgtimerdistance", String.valueOf(distance));
+        if (new_status != 0 && distance < ARG_DISTANCE) { //{ && new_status!=0) {
             new_status = 1; // bed
+        }
+        Log.i("msgtimer3", String.valueOf(new_status));
+
+        switch (new_status)
+        {
+            case 0:
+                time_study += delay;
+                break;
+            case 1:
+                time_bed += delay;
+                break;
+            case 2:
+                time_out += delay;
+                break;
         }
         past = SystemClock.elapsedRealtime();
     }
@@ -176,16 +207,8 @@ public class TimerActivity extends AppCompatActivity {
                 break;
         }
 
-        //editor.putString();
-        //editor.putBoolean();
-        //editor.putFloat();
-        //editor.putLong();
-        //editor.putInt();
-        //editor.putStringSet();
-
         editor.commit();
-
-
+        handler.removeCallbacks(runnable);
     }
 
 }

@@ -9,6 +9,7 @@ var sensors = new Float32Array([
      0.5, -0.5, 0.0, 10.0,
 ]);
 var sensorIdx;
+var sizeIdx;
 
 var posturesData = [
 // FL  FR   RL   RR    // F: Front, R: Rear, L: Left, R: Right
@@ -32,7 +33,7 @@ var lastClickedElem = null;
 
 window.addEventListener("load", function setupWebGL(event) {
     window.removeEventListener(event.type, setupWebGL, false);
- 
+
     postureImages =  [
         document.getElementById('normal'),
         document.getElementById('sway_back'),
@@ -48,7 +49,7 @@ window.addEventListener("load", function setupWebGL(event) {
     var paragraph = document.querySelector("p");
     var canvas = document.querySelector("canvas");
 
-    gl = canvas.getContext("webgl2");
+    gl = canvas.getContext("webgl");
     if (!gl) {
         paragraph.innerHTML = "Failed to get WebGL context";
         return;
@@ -104,6 +105,7 @@ window.addEventListener("load", function setupWebGL(event) {
     ]);
 
     var posIdx = gl.getAttribLocation(program, 'position');
+    sizeIdx = gl.getUniformLocation(program, "size");
     sensorIdx = gl.getUniformLocation(program, 'sensors');
 
     gl.enableVertexAttribArray(posIdx);
@@ -115,7 +117,7 @@ window.addEventListener("load", function setupWebGL(event) {
     gl.useProgram(program);
     draw(sensorIdx);
     refresh(0);
-    setInterval(() => { refresh(0); }, 10000);
+    setInterval(() => { refresh(0); }, 1000);
 }, false);
 
 window.addEventListener("beforeunload", cleanup, true);
@@ -137,7 +139,7 @@ function update(data, force = false) {
         {
             sensors[i*4+3] = data.sensor[i];
         }
-    
+
         if (data.pos != -1) {
             postureImages.forEach(e => {
                 e.classList.add("disabled");
@@ -200,10 +202,11 @@ function draw()
     resize();
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    gl.clearColor(0.0, 0.5, 0.0, 1.0);
+    gl.clearColor(1.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.uniformMatrix4fv(sensorIdx, false, sensors);
+    gl.uniform1f(sizeIdx, gl.canvas.width / 2);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
@@ -217,13 +220,13 @@ function resize()
 }
 
 function refresh(n) {
-    var rawJson = Android.refresh(n);
+    var rawJson = Android.refresh(1);
     var json = JSON.parse(rawJson);
 
     for (let i = 0; i < json.length; ++i) {
         var data = json[i].slice(1, 5);
         var ev = evaluatePosture(data);
-        update({sensor: data, pos: ev.pos, score: ev.score});
+        update({sensor: normalize(data), pos: ev.pos, score: ev.score});
         draw();
     }
 }
